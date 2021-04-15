@@ -81,7 +81,7 @@ class StudentController @Inject()(
       studentRepository.getStudentNameWithUniversityName().map {
         res =>
           val ans = for(i<-res)yield (StudentUniversity(i._1,i._2))
-          Ok(Json.toJson(ans))
+          Ok(Json.toJson(ans)).withHeaders("Access-Control-Allow-Origin" -> "*")
       }
     }
 
@@ -90,7 +90,7 @@ class StudentController @Inject()(
       studentRepository.getUniversityNameAndNoOfStudents().map {
         res =>
           val ans = for(i<-res)yield (UniversityStudentCount(i._1,i._2))
-          Ok(Json.toJson(ans))
+          Ok(Json.toJson(ans)).withHeaders("Access-Control-Allow-Origin" -> "*")
       }
     }
 

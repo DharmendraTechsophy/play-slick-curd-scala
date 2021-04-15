@@ -1,12 +1,14 @@
 package route
 
-import models.{Student, University}
+import models.{Student, University, User}
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test._
 import utils.JsonFormat._
+
+import java.sql.Date
 
 class RouteSpec extends PlaySpec with GuiceOneAppPerSuite {
 
@@ -56,6 +58,8 @@ class RouteSpec extends PlaySpec with GuiceOneAppPerSuite {
       contentAsString(result) mustBe """"{}""""
     }
 
+
+
     "get university list" in new WithApplication {
       val Some(result) = route(app, FakeRequest(GET, "/university/list"))
       status(result) mustBe OK
@@ -95,6 +99,54 @@ class RouteSpec extends PlaySpec with GuiceOneAppPerSuite {
 
     "delete university" in new WithApplication() {
       val Some(result) = route(app, FakeRequest(GET, "/university/delete/1"))
+      status(result) mustBe OK
+      contentType(result) mustBe Some("application/json")
+      contentAsString(result) mustBe """"{}""""
+    }
+
+
+    //user
+    "get user list" in new WithApplication {
+      val Some(result) = route(app, FakeRequest(GET, "/user/list"))
+      status(result) mustBe OK
+      contentType(result) mustBe Some("application/json")
+      contentAsString(result) mustBe """[{"firstName":"John","lastName":"Snow","userName":"jSnow11","email":"john@xyz.com","password":"12345678","createdDate":"1996-06-05","id":1},{"firstName":"Jammie","lastName":"Lanister","userName":"jlanister","email":"jimmy@xyz.com","password":"12345678","createdDate":"1997-06-05","id":2},{"firstName":"Jorah","lastName":"Mormant","userName":"mormantJorah","email":"mormant@xyz.com","password":"12345678","createdDate":"1998-06-05","id":3}]"""
+    }
+
+    "create user" in new WithApplication() {
+      val date = java.time.LocalDate.now.toString()
+      val user = User("Perth","Chowhan","pc101","pc101@xyz.com", "12345678",date, Some(4))
+      val Some(result) = route(app, FakeRequest(POST, "/user/create").withBody(Json.toJson(user)))
+      status(result) mustBe OK
+      contentType(result) mustBe Some("application/json")
+      contentAsString(result) mustBe """{"id":4}"""
+    }
+
+    "get user" in new WithApplication() {
+      val Some(result) = route(app, FakeRequest(GET, "/user/get/1"))
+      status(result) mustBe OK
+      contentType(result) mustBe Some("application/json")
+      contentAsString(result) mustBe """{"firstName":"John","lastName":"Snow","userName":"jSnow11","email":"john@xyz.com","password":"12345678","createdDate":"1996-06-05","id":1}"""
+    }
+
+    "Get invalid user" in new WithApplication() {
+      val Some(result) = route(app, FakeRequest(GET, "/user/get/156"))
+      status(result) mustBe OK
+      contentType(result) mustBe Some("application/json")
+      contentAsString(result) mustBe """"{}""""
+    }
+
+    "update user" in new WithApplication() {
+     // val date = java.time.LocalDate.now.toString()
+      val user = User("Perth","Chowhan","pc101","pc101@xyz.com","12345678","2021-04-12", Some(1))
+      val Some(result) = route(app, FakeRequest(POST, "/user/update").withBody(Json.toJson(user)))
+      status(result) mustBe OK
+      contentType(result) mustBe Some("application/json")
+      contentAsString(result) mustBe """"{}""""
+    }
+
+    "delete user" in new WithApplication() {
+      val Some(result) = route(app, FakeRequest(GET, "/user/delete/1"))
       status(result) mustBe OK
       contentType(result) mustBe Some("application/json")
       contentAsString(result) mustBe """"{}""""
