@@ -1,7 +1,7 @@
 package repository
 
 import javax.inject.{Inject, Singleton}
-import models.User
+import models.{User,UserInfo,Auth}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 import scala.concurrent.Future
@@ -11,20 +11,18 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
 
   import profile.api._
 
+
+
+
   def insert(user: User): Future[Int] =
     db.run {
       userTableQueryInc += user
     }
 
-  def insertAll(users: List[User]): Future[Seq[Int]] =
-    db.run {
-      userTableQueryInc ++= users
-    }
-
-  def search(username:String,pass:String):Future[Option[User]] =
+  def search(email:String,pass:String):Future[Option[User]] =
   {
     db.run {
-      userTableQuery.filter(_.userName===username).filter(_.password === pass).result.headOption
+      userTableQuery.filter(_.email===email).filter(_.password === pass).result.headOption
     }
   }
 
@@ -38,15 +36,6 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
       userTableQuery.filter(_.id === id).delete
     }
 
-  def getAll(): Future[List[User]] =
-    db.run {
-      userTableQuery.to[List].result
-    }
-
-  def getById(userId: Int): Future[Option[User]] =
-    db.run {
-      userTableQuery.filter(_.id === userId).result.headOption
-    }
 
 
 

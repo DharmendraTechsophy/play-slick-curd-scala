@@ -32,6 +32,11 @@ class StudentRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
       studentTableQuery.filter(_.id === id).delete
     }
 
+  def getByIdByUser(id:Int):Future[List[Student]] =
+    db.run{
+      studentTableQuery.filter(_.user_id === id).to[List].result
+    }
+
   def getAll(): Future[List[Student]] =
     db.run {
       studentTableQuery.to[List].result
@@ -64,7 +69,6 @@ class StudentRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
 
   }
 
-
   def ddl = studentTableQuery.schema
 
 }
@@ -77,14 +81,16 @@ private[repository] trait StudentTable extends UniversityTable {
   lazy protected val studentTableQuery = TableQuery[StudentTable]
   lazy protected val studentTableQueryInc = studentTableQuery returning studentTableQuery.map(_.id)
 
-  private[StudentTable] class StudentTable(tag: Tag) extends Table[Student](tag, "student") {
+  private[StudentTable] class StudentTable(tag: Tag) extends Table[Student](tag, "student")
+  {
     val id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     val name = column[String]("name")
     val email = column[String]("email")
     val UId = column[Int]("university_id")
+    val user_id = column[Int]("user_id")
     def universityID = foreignKey("_fk", UId, universityTableQuery)(_.id)
 
-    def * = (name,email,UId, id.?) <> (Student.tupled, Student.unapply)
+    def * = (name, email, UId, user_id, id.?) <> (Student.tupled, Student.unapply)
 
   }
 

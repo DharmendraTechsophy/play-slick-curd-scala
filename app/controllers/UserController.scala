@@ -1,26 +1,41 @@
 package controllers
 
 import com.google.inject.Inject
-import models.User
+import models.{User, UserInfo}
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc._
 import repository.{StudentRepository, UserRepository}
+import utils.AuthService
 import utils.JsonFormat._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserController @Inject()(
                                     cc: ControllerComponents,
+                                    auth:AuthService,
                                     userRepository: UserRepository
-                                  )(implicit ec: ExecutionContext)
-  extends AbstractController(cc) {
 
-  def list: Action[AnyContent] =
-    Action.async {
-      userRepository.getAll().map { res =>
-        Ok(Json.toJson(res)).withHeaders("Access-Control-Allow-Origin" -> "*")
-      }
+                              ) (implicit ec: ExecutionContext)
+  extends AbstractController(cc)  {
+
+
+
+  def search(): Action[JsValue] = {
+    Action.async(parse.json) { request =>
+      request.body.validate[User].fold(error => {Future.successful(BadRequest(JsError.toJson(error)))},
+        {
+          user =>
+            userRepository.search(user.email,user.password).map {
+              case Some(user) =>
+                Ok(Json.toJson(Map("token"-> auth.encodeToken(UserInfo(user.firstName,user.userName,user.email,user.id))))).withHeaders("Access-Control-Allow-Origin" -> "*")
+              case None =>
+                BadRequest("Email doesn't Exist").withHeaders("Access-Control-Allow-Origin" -> "*")
+            }
+        })
     }
+  }
+
+
 
   def create: Action[JsValue] = {
     println("Requesting for Adding the Record......")
@@ -47,13 +62,7 @@ class UserController @Inject()(
       }
     }
 
-  def get(userId: Int): Action[AnyContent] =
-    Action.async { _ =>
-      userRepository.getById(userId).map { userOpt =>
-        userOpt.fold(Ok(Json.toJson("{}")))(user => Ok(
-          Json.toJson(user))).withHeaders("Access-Control-Allow-Origin" -> "*")
-      }
-    }
+
 
   def update: Action[JsValue] = {
     println("Requesting for Updating the Record......")
@@ -71,22 +80,6 @@ class UserController @Inject()(
     }
   }
 
-  def search: Action[JsValue] = {
-    println("Requesting for Searching the Record......")
-    Action.async(parse.json) {
-      request =>
-        println("Searching request is : "+request.body)
-        request.body.validate[User].fold(
-          error => Future.successful(BadRequest(JsError.toJson(error)).withHeaders("Access-Control-Allow-Origin" -> "*")),
-          {
-            user =>
-            userRepository.search(user.userName,user.password).map { x => Ok(
-              Json.toJson(x)).withHeaders("Access-Control-Allow-Origin" -> "*")
-            }
-          }
-        )
-    }
-  }
 
 
 }

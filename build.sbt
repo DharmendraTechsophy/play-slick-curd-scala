@@ -21,6 +21,15 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies += "mysql" % "mysql-connector-java" % "6.0.6"
+
+libraryDependencies ++=
+  Seq(
+    guice,
+    "com.github.jwt-scala" %% "jwt-core" % "7.1.3"
+  )
+
+
+
 routesGenerator := InjectedRoutesGenerator
 
 javaOptions in Test += "-Dconfig.file=conf/test.conf"

@@ -11,8 +11,10 @@ OPTIONS /*all                       controllers.HomeController.preflight(all)
 # Student routes
 GET     /student/list                           controllers.StudentController.list
 
-POST    /student/create                        controllers.StudentController.create
+POST    /student/create                       controllers.StudentController.create
+POST    /student/createbyidbyuser             controllers.StudentController.createByIdByUser
 GET     /student/get/:studentId                          controllers.StudentController.get(studentId: Int)
+GET     /student/getbyidbyuser             controllers.StudentController.getByIdByUser
 POST    /student/update                        controllers.StudentController.update
 
 GET     /student/delete/:studentId                        controllers.StudentController.delete(studentId: Int)
@@ -24,8 +26,10 @@ GET     /student/join2                          controllers.StudentController.ge
 
 # University routes
 GET     /university/list                           controllers.UniversityController.list
+GET     /university/getbyidbyuser           controllers.UniversityController.getByIdByUser
 
 POST    /university/create                        controllers.UniversityController.create
+POST    /university/createbyidbyuser             controllers.UniversityController.createByIdByUser
 
 GET     /university/get/:universityId                           controllers.UniversityController.get(universityId: Int)
 
@@ -36,16 +40,16 @@ GET     /university/delete/:universityId                         controllers.Uni
 
 
 # User routes
-GET     /user/list                           controllers.UserController.list
 
 POST    /user/create                        controllers.UserController.create
 POST    /user/register                        controllers.UserController.create
 POST     /user/search                           controllers.UserController.search
-GET     /user/get/:userId                           controllers.UserController.get(userId: Int)
 
 POST    /user/update                        controllers.UserController.update
 
 GET     /user/delete/:userId                         controllers.UserController.delete(userId: Int)
+
+
 
 
 # Map static resources from the /public folder to the /assets URL path

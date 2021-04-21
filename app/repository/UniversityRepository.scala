@@ -42,6 +42,11 @@ class UniversityRepository @Inject()(protected val dbConfigProvider: DatabaseCon
       universityTableQuery.filter(_.id === universityId).result.headOption
     }
 
+  def getByIdByUser(id:Int):Future[List[University]] =
+    db.run{
+      universityTableQuery.filter(_.userId === id).to[List].result
+    }
+
   def ddl = universityTableQuery.schema
 
 }
@@ -54,12 +59,12 @@ private[repository] trait UniversityTable{
   lazy protected val universityTableQuery = TableQuery[UniversityTable]
   lazy protected val universityTableQueryInc = universityTableQuery returning universityTableQuery.map(_.id)
 
-  private[UniversityTable] class UniversityTable(tag: Tag) extends Table[University](tag, "university") {
+  private[UniversityTable] class UniversityTable(tag: Tag) extends Table[University](tag, "university1") {
     val id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     val name = column[String]("name")
     val location = column[String]("location")
-
-    def * = (name,location, id.?) <> (University.tupled, University.unapply)
+    val userId = column[Int]("user_id")
+    def * = (name,location, userId,id.?) <> (University.tupled, University.unapply)
   }
 
 }

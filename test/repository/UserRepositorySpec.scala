@@ -13,17 +13,6 @@ class UserRepositorySpec extends PlaySpec with GuiceOneAppPerTest {
 
   "User repository" should {
 
-    "get all rows" in new WithUserRepository() {
-      val result = await(userRepo.getAll())
-      result.length mustBe 3
-      result.head.firstName mustBe "John"
-    }
-
-    "get single rows" in new WithUserRepository() {
-      val result = await(userRepo.getById(1))
-      result.isDefined mustBe true
-      result.get.firstName mustBe "John"
-    }
 
     "insert a row" in new WithUserRepository() {
       val date = java.time.LocalDate.now.toString()
@@ -33,12 +22,6 @@ class UserRepositorySpec extends PlaySpec with GuiceOneAppPerTest {
       studentId mustBe 4
     }
 
-    "insert multiple rows" in new WithUserRepository() {
-      val date = java.time.LocalDate.now.toString()
-      val list = List(User("Perth","Chowhan","pc101","pc101@xyz.com","12345678" ,date, Some(1)))
-      val result = userRepo.insertAll(list)
-      await(result) mustBe Seq(4)
-    }
 
     "update a row" in new WithUserRepository() {
       val date = java.time.LocalDate.now.toString()
